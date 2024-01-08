@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\Product;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
 class ProductController extends Controller
@@ -32,6 +33,21 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
+        $validator=Validator::make($request->all(),[
+            'name'=>'required|string|between:2,100',
+            'slug'=>'required|string|between:2,100',
+            'price'=>'required|string|between:2,100',
+            // 'slug'=>'required|string|between:2,100'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status'=>0,
+                'error'=>$validator->errors()->first(),
+                'data'=> ''
+            ],422);
+        }
+
         // first Method
         // $category = Category::find($request->category_id);
         // $product = $category->products()->create([
@@ -69,13 +85,24 @@ class ProductController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show()
+    public function show(int $id)
     {
-         $product = Product::with('category')->get();
-        //$category = Category::with('products')->get();
+        //  $product = Product::with('category')->get();
+        // //$category = Category::with('products')->get();
 
-        return response()->json([
+        // return response()->json([
+        //     'status' => 1,
+        //     'data' => $product
+        //     //'data' => $category
+        // ]);
+
+        //another method
+        $category=Category::all();
+        $product= Product::find($id);
+
+         return response()->json([
             'status' => 1,
+            'category'=>$category,
             'data' => $product
             //'data' => $category
         ]);
