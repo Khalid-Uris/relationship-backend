@@ -27,5 +27,6 @@ Route::group(['prefix'=>'admin'],function(){
 
     Route::get('/products',[ProductController::class,'index']);
     Route::post('/add/products',[ProductController::class,'store']);
-    Route::get('/products/list',[ProductController::class,'show']);
+    Route::get('/products/{product_id}/edit',[ProductController::class,'show']);
+    Route::put('/products/{product_id}/update',[ProductController::class,'update']);
 });

@@ -85,7 +85,7 @@ class ProductController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(int $id)
+    public function show(int $product_id)
     {
         //  $product = Product::with('category')->get();
         // //$category = Category::with('products')->get();
@@ -98,12 +98,12 @@ class ProductController extends Controller
 
         //another method
         $category=Category::all();
-        $product= Product::find($id);
+        $product= Product::find($product_id);
 
          return response()->json([
             'status' => 1,
             'category'=>$category,
-            'data' => $product
+            'product' => $product
             //'data' => $category
         ]);
     }
@@ -111,9 +111,37 @@ class ProductController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, int $product_id)
     {
-        //
+        $validator=Validator::make($request->all(),[
+            'category_id'=>'required',
+            'name'=>'required|string|between:2,100',
+            'slug'=>'required|string|between:2,100',
+            'price'=>'required|string|between:2,100',
+            // 'slug'=>'required|string|between:2,100'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status'=>0,
+                'error'=>$validator->errors()->first(),
+                'data'=> (object) []
+            ],422);
+        }
+        $product = Category::findOrFail($request->category_id)
+                    ->products()->where('id',$product_id)->first();
+
+        $product->name = $request->name;
+        $product->slug = Str::slug($request->slug);
+        $product->price = $request->price;
+
+        $product->update();
+
+        return response()->json([
+            'status' => 1,
+            'data' => $product
+            //'data' => $category
+        ]);
     }
 
     /**
