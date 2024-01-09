@@ -128,17 +128,24 @@ class ProductController extends Controller
                 'data'=> (object) []
             ],422);
         }
-        $product = Category::findOrFail($request->category_id)
-                    ->products()->where('id',$product_id)->first();
+        // $product = Category::findOrFail($request->category_id)
+        //             ->products()->where('id',$product_id)->first();
 
-        $product->name = $request->name;
-        $product->slug = Str::slug($request->slug);
-        $product->price = $request->price;
+        // $product->name = $request->name;
+        // $product->slug = Str::slug($request->slug);
+        // $product->price = $request->price;
+        // $product->update();
 
-        $product->update();
+        $category=Category::findOrFail($request->category_id);
+        $product=$category->products()->where('id', $product_id)->update([
+            'name' => $request->name,
+            'slug' => Str::slug($request->slug),
+            'price' => $request->price
+        ]);
 
         return response()->json([
             'status' => 1,
+            'message' => 'Product Updated Successfully.',
             'data' => $product
             //'data' => $category
         ]);
